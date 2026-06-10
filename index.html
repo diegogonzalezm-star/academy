@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoPredict - Predicciones Estadísticas de Criptomonedas</title>
+    <meta name="description" content="Plataforma de análisis estadístico y predicciones para inversiones inteligentes en criptomonedas según tu perfil de riesgo.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="glow-node glow-1"></div>
+    <div class="glow-node glow-2"></div>
+    <div class="glow-node glow-3"></div>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="14" stroke="url(#logoGrad)" stroke-width="3" fill="none"/>
+                    <path d="M11 19L15 11L18 16L22 9" stroke="url(#logoGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#00F2FE"/>
+                            <stop offset="1" stop-color="#4FACFE"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>Crypto<span class="gradient-text">Predict</span></span>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-section="dashboard">📊 Dashboard</button>
+                <button class="nav-tab" data-section="academy">🎓 Academia</button>
+            </nav>
+            <div class="status-indicator">
+                <span class="status-pulse" id="status-dot"></span>
+                <span id="status-text">Sincronizando mercado...</span>
+            </div>
+            <div class="auth-status-container" style="display: flex; align-items: center; gap: 1rem;">
+                <span id="user-display" style="display: none; font-size: 0.9rem; font-weight: 600; color: var(--accent-green);">👤 Hola, <span id="username-span"></span></span>
+                <button id="btn-auth-toggle" class="btn-secondary" style="padding: 0.4rem 1rem; font-size: 0.85rem; border-radius: 8px;">Iniciar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- DASHBOARD SECTION -->
+    <main class="main-container" id="section-dashboard">
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Optimiza tus Inversiones con <span class="gradient-text">Ciencia de Datos</span></h1>
+                <p>Nuestra IA y algoritmos estadísticos analizan indicadores de mercado clave (RSI, Medias Móviles, Sharpe y Volatilidad) para sugerir la mejor cartera según tu perfil de riesgo.</p>
+            </div>
+            <div class="glass-card profiler-card">
+                <div class="card-header">
+                    <h2>Configura tu Perfil de Inversión</h2>
+                    <p>Ajusta los parámetros para calibrar las predicciones matemáticas</p>
+                </div>
+                <div class="profile-selectors">
+                    <div class="select-group">
+                        <label>Tolerancia al Riesgo</label>
+                        <div class="radio-tiles">
+                            <label class="tile-option"><input type="radio" name="risk" value="low" checked><div class="tile-content"><span class="icon">🛡️</span><span class="title">Bajo</span><span class="desc">Preservar capital (BTC, ETH)</span></div></label>
+                            <label class="tile-option"><input type="radio" name="risk" value="medium"><div class="tile-content"><span class="icon">⚖️</span><span class="title">Medio</span><span class="desc">Balanceado (Rendimiento/Riesgo)</span></div></label>
+                            <label class="tile-option"><input type="radio" name="risk" value="high"><div class="tile-content"><span class="icon">⚡</span><span class="title">Alto</span><span class="desc">Búsqueda de máximas ganancias</span></div></label>
+                        </div>
+                    </div>
+                    <div class="select-group">
+                        <label>Plazo de Inversión</label>
+                        <div class="radio-tiles">
+                            <label class="tile-option"><input type="radio" name="term" value="short" checked><div class="tile-content"><span class="icon">⏳</span><span class="title">Corto</span><span class="desc">Días a semanas (Enfoque RSI/Momentum)</span></div></label>
+                            <label class="tile-option"><input type="radio" name="term" value="medium"><div class="tile-content"><span class="icon">📅</span><span class="title">Medio</span><span class="desc">Meses (Enfoque Tendencias SMA)</span></div></label>
+                            <label class="tile-option"><input type="radio" name="term" value="long"><div class="tile-content"><span class="icon">🏛️</span><span class="title">Largo</span><span class="desc">Años (Sharpe Ratio e Crecimiento)</span></div></label>
+                        </div>
+                    </div>
+                </div>
+                <button id="btn-calculate" class="btn-primary">Generar Recomendación Estadística</button>
+            </div>
+        </section>
+
+        <section class="dashboard-grid">
+            <div class="glass-card main-recommendation-card">
+                <div class="card-header">
+                    <span class="badge">Recomendación Top</span>
+                    <h2 id="rec-title">Cargando análisis...</h2>
+                </div>
+                <div class="recommendation-content">
+                    <div class="score-display">
+                        <div class="score-ring">
+                            <svg class="progress-ring" width="120" height="120">
+                                <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                                <circle id="score-progress" class="progress-ring-fill" stroke="url(#scoreGrad)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                            </svg>
+                            <div class="score-value"><span id="score-num">0%</span><span class="score-label">Confianza</span></div>
+                        </div>
+                        <div class="metrics-quick">
+                            <div class="m-item"><span class="m-label">Volatilidad Anual</span><span class="m-val" id="rec-vol">0.0%</span></div>
+                            <div class="m-item"><span class="m-label">Ratio de Sharpe</span><span class="m-val" id="rec-sharpe">0.00</span></div>
+                            <div class="m-item"><span class="m-label">Fuerza Relativa (RSI)</span><span class="m-val" id="rec-rsi">0</span></div>
+                        </div>
+                    </div>
+                    <div class="analysis-verdict">
+                        <h3>Análisis Cualitativo</h3>
+                        <p id="rec-verdict">Por favor, presione el botón de cálculo para proyectar escenarios basados en algoritmos estadísticos.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="card-header">
+                    <div class="header-flex">
+                        <h2>Proyección Estadística (Monte Carlo & Regresión)</h2>
+                        <div class="coin-selector-container"><select id="chart-coin-select" class="custom-select"></select></div>
+                    </div>
+                    <p>Proyección de precio a 30 días basándose en la tendencia actual y la volatilidad implícita.</p>
+                </div>
+                <div class="chart-wrapper"><canvas id="prediction-chart"></canvas></div>
+                <div class="chart-legend-custom">
+                    <span class="legend-item"><span class="dot optimistic"></span>Optimista (+1.5 Std Dev)</span>
+                    <span class="legend-item"><span class="dot neutral"></span>Proyección Base (Media)</span>
+                    <span class="legend-item"><span class="dot pessimistic"></span>Pesimista (-1.5 Std Dev)</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card table-card">
+            <div class="card-header">
+                <h2>Tabla Comparativa de Indicadores Estadísticos</h2>
+                <p>Todos los cálculos son actualizados cada 10 segundos según simulaciones estocásticas de mercado.</p>
+            </div>
+            <div class="table-responsive">
+                <table class="market-table">
+                    <thead><tr><th>Moneda</th><th>Precio Act.</th><th>Var. 24h</th><th>RSI (14d)</th><th>Volatilidad (30d)</th><th>Sharpe Ratio</th><th>Tendencia (SMA)</th><th>Puntuación Perfil</th></tr></thead>
+                    <tbody id="market-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="glass-card simulator-card">
+            <div class="card-header">
+                <h2>Simulador de Inversión Histórica (Backtesting)</h2>
+                <p>¿Cuánto habrías ganado si hubieras invertido en un activo específico o siguiendo la estrategia en el último año?</p>
+            </div>
+            <div class="simulator-grid">
+                <div class="sim-inputs">
+                    <div class="input-group">
+                        <label for="sim-amount">Monto Inicial a Invertir (USD)</label>
+                        <div class="input-wrapper"><span class="prefix">$</span><input type="number" id="sim-amount" value="1000" min="100"></div>
+                    </div>
+                    <div class="input-group">
+                        <label for="sim-coin-select">Seleccionar Activo para Invertir</label>
+                        <select id="sim-coin-select" class="custom-select" style="width: 100%; padding: 0.8rem; border-radius: 10px;">
+                            <option value="auto">🤖 Estrategia Sugerida (Algoritmo)</option>
+                            <option value="BTC">Bitcoin (BTC)</option>
+                            <option value="ETH">Ethereum (ETH)</option>
+                            <option value="SOL">Solana (SOL)</option>
+                            <option value="ADA">Cardano (ADA)</option>
+                            <option value="XRP">Ripple (XRP)</option>
+                            <option value="DOT">Polkadot (DOT)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Estrategia / Perfil Asignado</label>
+                        <div class="strategy-badge" id="sim-strategy-badge">Estrategia Conservadora (Bajo Riesgo)</div>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button id="btn-run-sim" class="btn-secondary" style="flex: 1; padding: 0.8rem;">Ejecutar Simulación</button>
+                        <button id="btn-save-sim" class="btn-primary" style="flex: 1; padding: 0.8rem; display: none;">💾 Guardar Inversión</button>
+                    </div>
+                </div>
+                <div class="sim-results">
+                    <div class="sim-metric-card highlight"><span class="lbl">Valor Final Estimado</span><span class="val text-success" id="sim-final-val">$1,340.50</span></div>
+                    <div class="sim-metric-card"><span class="lbl">Retorno de Inversión (ROI)</span><span class="val text-success" id="sim-roi">+34.05%</span></div>
+                    <div class="sim-metric-card"><span class="lbl">Máximo Drawdown (Caída)</span><span class="val text-danger" id="sim-drawdown">-12.4%</span></div>
+                    <div class="sim-metric-card"><span class="lbl">Ganancia Neta</span><span class="val" id="sim-net-profit">$340.50</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card saved-portfolios-card" id="saved-portfolios-sec" style="display: none;">
+            <div class="card-header">
+                <h2>Mis Inversiones Guardadas</h2>
+                <p>Historial de simulaciones y compras estadísticas guardadas en tu base de datos.</p>
+            </div>
+            <div class="table-responsive">
+                <table class="market-table">
+                    <thead><tr><th>Fecha</th><th>Activo</th><th>Monto Invertido</th><th>Estrategia</th><th>Máx. Drawdown</th><th>ROI Histórico</th><th>Valor Final</th></tr></thead>
+                    <tbody id="saved-portfolios-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- ACADEMY SECTION -->
+    <main class="main-container academy-container" id="section-academy" style="display:none;">
+        <!-- Academy Header -->
+        <section class="academy-hero">
+            <div class="academy-hero-text">
+                <div class="academy-eyebrow">🎓 CryptoPredict Academia</div>
+                <h1>Aprende a invertir.<br><span class="gradient-text">Una lección a la vez.</span></h1>
+                <p>Domina los conceptos que usa nuestro algoritmo: RSI, Sharpe, volatilidad y más — con ejercicios interactivos y progresión real.</p>
+            </div>
+            <div class="academy-xp-card glass-card">
+                <div class="xp-header">
+                    <span class="xp-flame">🔥</span>
+                    <div>
+                        <div class="xp-streak-num" id="academy-streak">0</div>
+                        <div class="xp-streak-label">días seguidos</div>
+                    </div>
+                    <div class="xp-divider"></div>
+                    <div>
+                        <div class="xp-streak-num" id="academy-xp">0</div>
+                        <div class="xp-streak-label">XP total</div>
+                    </div>
+                    <div class="xp-divider"></div>
+                    <div>
+                        <div class="xp-streak-num" id="academy-lessons">0</div>
+                        <div class="xp-streak-label">lecciones</div>
+                    </div>
+                </div>
+                <div class="xp-bar-wrap">
+                    <div class="xp-bar-label">
+                        <span id="xp-level-label">Nivel 1 — Principiante</span>
+                        <span id="xp-bar-text">0 / 100 XP</span>
+                    </div>
+                    <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Learning Path -->
+        <section class="learning-path">
+            <div class="path-header">
+                <h2>Tu Ruta de Aprendizaje</h2>
+                <p>Completa cada unidad en orden para desbloquear la siguiente</p>
+            </div>
+            <div class="path-units" id="path-units">
+                <!-- Dynamically generated -->
+            </div>
+        </section>
+
+        <!-- Active Lesson Panel -->
+        <div class="lesson-modal-overlay" id="lesson-overlay" style="display:none;">
+            <div class="lesson-modal glass-card" id="lesson-modal">
+                <div class="lesson-top-bar">
+                    <button class="lesson-close-btn" id="lesson-close">✕</button>
+                    <div class="lesson-progress-bar-wrap">
+                        <div class="lesson-progress-bar" id="lesson-progress-bar" style="width:0%"></div>
+                    </div>
+                    <div class="lesson-hearts" id="lesson-hearts">❤️❤️❤️</div>
+                </div>
+                <div class="lesson-body" id="lesson-body">
+                    <!-- Dynamic lesson content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Toast -->
+        <div class="completion-toast" id="completion-toast" style="display:none;">
+            <div class="toast-inner">
+                <div class="toast-emoji" id="toast-emoji">🎉</div>
+                <div class="toast-title" id="toast-title">¡Lección completada!</div>
+                <div class="toast-xp" id="toast-xp">+20 XP</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="glass-card modal-content" style="max-width: 400px; width: 90%; margin: 10% auto; padding: 2rem; position: relative;">
+            <button id="modal-close" style="position: absolute; right: 1rem; top: 1rem; background: transparent; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer;">&times;</button>
+            <div id="login-form-div">
+                <div class="card-header" style="margin-bottom: 1.5rem;"><h2>Iniciar Sesión</h2><p>Accede a tu base de datos de inversiones</p></div>
+                <form id="login-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="input-group"><label for="login-username">Usuario</label><input type="text" id="login-username" required style="width:100%; padding:0.75rem; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white;"></div>
+                    <div class="input-group"><label for="login-password">Contraseña</label><input type="password" id="login-password" required style="width:100%; padding:0.75rem; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white;"></div>
+                    <button type="submit" class="btn-primary" style="margin-top: 1rem;">Ingresar</button>
+                    <p style="font-size:0.85rem; text-align:center; color:var(--text-secondary);">¿No tienes cuenta? <a href="#" id="link-show-register" style="color:var(--primary-cyan); text-decoration:none; font-weight:600;">Regístrate aquí</a></p>
+                </form>
+            </div>
+            <div id="register-form-div" style="display: none;">
+                <div class="card-header" style="margin-bottom: 1.5rem;"><h2>Crear Cuenta</h2><p>Registra un nuevo usuario en el sistema</p></div>
+                <form id="register-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="input-group"><label for="reg-username">Nombre de Usuario</label><input type="text" id="reg-username" required style="width:100%; padding:0.75rem; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white;"></div>
+                    <div class="input-group"><label for="reg-password">Contraseña</label><input type="password" id="reg-password" required style="width:100%; padding:0.75rem; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white;"></div>
+                    <button type="submit" class="btn-primary" style="margin-top: 1rem;">Registrarse</button>
+                    <p style="font-size:0.85rem; text-align:center; color:var(--text-secondary);">¿Ya tienes cuenta? <a href="#" id="link-show-login" style="color:var(--primary-cyan); text-decoration:none; font-weight:600;">Inicia Sesión</a></p>
+                </form>
+            </div>
+            <div id="auth-error-msg" style="color:var(--error-red); font-size:0.85rem; text-align:center; margin-top:1rem; display:none;"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 CryptoPredict. Desarrollado con fines de análisis estadístico. Las inversiones en criptomonedas conllevan riesgos de capital.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+    <script src="academy.js"></script>
+    <svg style="width:0;height:0;position:absolute;" aria-hidden="true" focusable="false">
+        <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00F2FE"/><stop offset="100%" stop-color="#00F5A0"/>
+        </linearGradient>
+    </svg>
+</body>
+</html>
